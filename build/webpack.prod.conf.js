@@ -10,6 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 
 const env = require('../config/prod.env')
 
@@ -28,6 +29,28 @@ const webpackConfig = merge(baseWebpackConfig, {
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
   },
   plugins: [
+    // // 引用 manifest.json
+    new webpack.DllReferencePlugin({
+      manifest: require('../public/vendor/vendor.manifest.json')
+    }), 
+    // // 将 dll 注入到 生成的 html 模板中
+    new AddAssetHtmlPlugin({
+      // 要添加到编译中的文件的绝对路径，以及生成的HTML文件。支持globby字符串
+      filepath: path.resolve(__dirname, '../public/vendor/*.js'),
+      // 文件输出目录
+      outputPath: 'vendor',
+      // 脚本或链接标记的公共路径
+      publicPath: 'vendor',
+      includeSourcemap: false
+    }),
+    //拷贝到dist文件夹下去
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../public/vendor'),
+        to: config.build.assetsSubDirectory,
+        ignore: ['.*']
+      }
+    ]),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
       'process.env': env
