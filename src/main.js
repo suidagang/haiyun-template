@@ -3,7 +3,13 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+//清除浏览器默认样式
 import "@/less/reset.css"
+//封装axios  ajax请求
+import {post,fetch} from '@/request/api'
+//定义全局变量
+Vue.prototype.$post=post;
+Vue.prototype.$get=fetch;
 
 Vue.config.productionTip = false
 
